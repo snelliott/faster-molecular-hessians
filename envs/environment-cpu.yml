@@ -1,0 +1,28 @@
+# Environment that does not use a GPU
+#  Installs packages needed for all features
+name: jitterbug
+channels:
+  - defaults
+  - conda-forge
+  - pytorch
+dependencies:
+  - python==3.10.*
+
+  # Standard data analysis tools
+  - pandas==1.*
+  - scipy==1.10.*
+  - jupyterlab
+  - matplotlib
+  - pytest
+  
+  # Quantum chemistry
+  - tblite==0.3.*
+
+  # Use Conda PyTorch to avoid OpenMP disagreement with other libraries
+  - pytorch==2.0.*
+  - cpuonly
+
+  - pip
+  - pip:
+    # Need torch for BOTorch
+    - -e ..[test]
