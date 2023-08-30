@@ -35,7 +35,7 @@ def get_model_inputs(atoms: Atoms, reference: Atoms) -> np.ndarray:
     # Append the displacements and products of displacements
     return np.concatenate([
         disp_matrix,
-        disp_prod_matrix[np.triu_indices(n_terms)]
+        disp_prod_matrix[np.triu_indices(n_terms)] / 2
     ], axis=0)
 
 
@@ -67,7 +67,6 @@ class HarmonicModel(EnergyModel):
     def train(self, data: list[Atoms]) -> LinearModel:
         # X: Displacement vectors for each
         x = [get_model_inputs(atoms, self.reference) for atoms in data]
-        x = np.multiply(x, 0.5)
 
         # Y: Subtract off the reference energy
         ref_energy = self.reference.get_potential_energy()
