@@ -66,6 +66,7 @@ class HarmonicModel(EnergyModel):
     def train(self, data: list[Atoms]) -> LinearModel:
         # X: Displacement vectors for each
         x = [get_model_inputs(atoms, self.reference) for atoms in data]
+        x = np.multiply(x, 0.5)
 
         # Y: Subtract off the reference energy
         ref_energy = self.reference.get_potential_energy()

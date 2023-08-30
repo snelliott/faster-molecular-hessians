@@ -12,19 +12,19 @@ def test_disp_matrix():
     # With a single displacement only the first term should be nonzero
     atoms.positions[0, 0] += 0.1
     disp_matrix = get_model_inputs(atoms, reference)
-    assert disp_matrix.shape == (27,)  # 6 linear, 21 harmonic terms
+    assert disp_matrix.size == 27  # 6 linear, 21 harmonic terms
     assert (disp_matrix != 0).sum() == 2  # One linear and one harmonic term
     assert np.isclose(disp_matrix[0], 0.1)  # Linear terms
-    assert np.isclose(disp_matrix[6], 0.01 / 2)  # Harmonic terms
+    assert np.isclose(disp_matrix[6], 0.01)  # Harmonic terms
 
     # With two displacements, there should be 3 nonzero terms
     atoms.positions[1, 0] += 0.05
     disp_matrix = get_model_inputs(atoms, reference)
     assert (disp_matrix != 0).sum() == 2 + 3
     assert np.isclose(disp_matrix[[0, 3]], [0.1, 0.05]).all()  # Linear terms
-    assert np.isclose(disp_matrix[6], 0.01 / 2)  # (Atom 0, x) * (Atom 0, x)
-    assert np.isclose(disp_matrix[6 + 3], 0.1 * 0.05)  # (Atom 0, x) * (Atom 1, x) * 2 (harmonic)
-    assert np.isclose(disp_matrix[6 + 6 + 5 + 4], 0.0025 / 2)  # (Atom 1, x) * (Atom 1, x)
+    assert np.isclose(disp_matrix[6], 0.01)  # (Atom 0, x) * (Atom 0, x)
+    assert np.isclose(disp_matrix[6 + 3], 0.1 * 0.05 * 2)  # (Atom 0, x) * (Atom 1, x) * 2 (harmonic)
+    assert np.isclose(disp_matrix[6 + 6 + 5 + 4], 0.0025)  # (Atom 1, x) * (Atom 1, x)
 
 
 def test_linear_model(train_set):
