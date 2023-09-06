@@ -26,7 +26,6 @@ def get_model_inputs(atoms: Atoms, reference: Atoms) -> np.ndarray:
     # Compute the displacements and the products of displacement
     disp_matrix = (atoms.positions - reference.positions).flatten()
     disp_prod_matrix = disp_matrix[:, None] * disp_matrix[None, :]
-
     # Multiply the off-axis terms by two, as they appear twice in the energy model
     n_terms = len(atoms) * 3
     off_diag = np.triu_indices(n_terms, k=1)
@@ -71,7 +70,6 @@ class HarmonicModel(EnergyModel):
         # Y: Subtract off the reference energy
         ref_energy = self.reference.get_potential_energy()
         y = [atoms.get_potential_energy() - ref_energy for atoms in data]
-
         # Fit the ARD model and ensure it captures the data well
         model = self.regressor(fit_intercept=False).fit(x, y)
         pred = model.predict(x)
@@ -80,7 +78,7 @@ class HarmonicModel(EnergyModel):
             raise ValueError(f'Model error exceeds 1 meV. Actual: {max_error:.2e}')
 
         return model
-
+    
     def mean_hessian(self, model: LinearModel) -> np.ndarray:
         return self._params_to_hessian(model.coef_)
 
@@ -129,4 +127,6 @@ class HarmonicModel(EnergyModel):
         hessian[triu_inds] = param[n_coords:]  # The first n_coords terms are the linear part
         hessian[off_diag_triu_inds] /= 2
         hessian.T[triu_inds] = hessian[triu_inds]
+        # v = np.sqrt(self.reference.get_masses()).repeat(3).reshape(-1, 1)
+        # hessian /= np.dot(v, v.T)
         return hessian
