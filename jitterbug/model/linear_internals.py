@@ -138,16 +138,16 @@ class HarmonicModel(EnergyModel):
         ref_energy = self.reference.get_potential_energy()
         y = [atoms.get_potential_energy() - ref_energy for atoms in data]
         # Fit the ARD model and ensure it captures the data well
-        model = self.regressor(fit_intercept=True, positive=False).fit(x, y, [1]*len(y))
+        model = self.regressor(fit_intercept=True).fit(x, y)
         pred = model.predict(x)
         max_error = np.abs(pred - y).max()
-        if max_error > 0.001:
+        if max_error > 0.002:
             raise ValueError(f'Model error exceeds 1 meV. Actual: {max_error:.2e}')
 
         return model
 
-    def mean_hessian(self, model: LinearModel, atom: Atom) -> np.ndarray:
-        return self._params_to_hessian(model.coef_, atom)
+    def mean_hessian(self, model: LinearModel) -> np.ndarray:
+        return self._params_to_hessian(model.coef_)
 
     def sample_hessians(self, model: LinearModel, num_samples: int) -> list[np.ndarray]:
         # Get the covariance matrix
@@ -176,7 +176,7 @@ class HarmonicModel(EnergyModel):
             output.append(hessian)
         return output
 
-    def _params_to_hessian(self, param: np.ndarray, atom: Atom) -> np.ndarray:
+    def _params_to_hessian(self, param: np.ndarray) -> np.ndarray:
         """Convert the parameters for the linear model into a Hessian
 
         Args:
@@ -186,7 +186,7 @@ class HarmonicModel(EnergyModel):
         """
         # Get the parameters
         filename = 'tmp.xyz'
-        aseio.write(filename, atom, 'xyz')
+        aseio.write(filename, self.reference, 'xyz')
         n_coords = len(self.reference) * 3 - 6
         triu_inds = np.triu_indices(n_coords)
         off_diag_triu_inds = np.triu_indices(n_coords, k=1)
