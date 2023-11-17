@@ -6,7 +6,6 @@ and that smaller parameters are more likely than larger
 """
 import numpy as np
 from ase import Atoms
-from ase import Atom
 from ase import io as aseio
 from geometric.molecule import Molecule
 from geometric.internal import DelocalizedInternalCoordinates as DIC
