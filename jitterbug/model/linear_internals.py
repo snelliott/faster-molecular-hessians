@@ -17,7 +17,7 @@ import geometric
 
 
 def get_internal_diff(ref_int: DIC, ref_mol: Molecule, atoms: Atoms) -> np.ndarray:
-    """Finds the differences in the values of the internal coordinates for two 
+    """Finds the differences in the values of the internal coordinates for two
     of geometries.
     Args:
         ref_int: delocalized internal coordinate object (geometric package)
@@ -35,7 +35,7 @@ def get_internal_diff(ref_int: DIC, ref_mol: Molecule, atoms: Atoms) -> np.ndarr
     ref_coords = ref_mol.xyzs[0].flatten()
     pert_coords = pert_mol.xyzs[0].flatten()
     int_diff = ref_int.calcDiff(pert_coords, ref_coords)
-    return(int_diff)
+    return (int_diff)
 
 # def get_internal_coords(atoms: Atoms) -> np.ndarray:
 #     #filename = 'tmp.xyz'
@@ -63,7 +63,7 @@ def get_model_internal_inputs(atoms: Atoms, ref_mol: Molecule, ref_IC: DIC) -> n
         Array of Jacobian and Hessian displacements, in internal coordinates
     """
     # Compute the displacements and the products of displacement
-    disp_matrix = get_internal_diff(ref_IC, ref_mol, atoms) 
+    disp_matrix = get_internal_diff(ref_IC, ref_mol, atoms)
     disp_prod_matrix = disp_matrix[:, None] * disp_matrix[None, :]
     n_terms = len(atoms) * 3 - 6
     off_diag = np.triu_indices(n_terms, k=1)
@@ -73,6 +73,7 @@ def get_model_internal_inputs(atoms: Atoms, ref_mol: Molecule, ref_IC: DIC) -> n
         disp_matrix,
         disp_prod_matrix[np.triu_indices(n_terms)] / 2
     ], axis=0)
+
 
 def get_model_inputs(atoms: Atoms, reference: Atoms) -> np.ndarray:
     """Get the inputs for the model, which are derived from the displacements
@@ -86,8 +87,7 @@ def get_model_inputs(atoms: Atoms, reference: Atoms) -> np.ndarray:
     """
 
     # Compute the displacements and the products of displacement
-    #disp_matrix = (atoms.positions).flatten()
-    disp_matrix = (1/(atoms.positions - reference.positions)).flatten()
+    disp_matrix = (atoms.positions - reference.positions).flatten()
     disp_prod_matrix = disp_matrix[:, None] * disp_matrix[None, :]
     # Multiply the off-axis terms by two, as they appear twice in the energy model
     n_terms = len(atoms) * 3
@@ -145,7 +145,7 @@ class HarmonicModel(EnergyModel):
             raise ValueError(f'Model error exceeds 1 meV. Actual: {max_error:.2e}')
 
         return model
-    
+
     def mean_hessian(self, model: LinearModel, atom: Atom) -> np.ndarray:
         return self._params_to_hessian(model.coef_, atom)
 
@@ -202,8 +202,7 @@ class HarmonicModel(EnergyModel):
         IC = DIC(molecule, build=True, remove_tr=True)
         coords = molecule.xyzs[0].flatten()*geometric.nifty.ang2bohr
         hessian_cart = IC.calcHessCart(coords,  gradq, hessian)
-        #print(IC.Internals)
-        #print(IC.Prims)
-        #print(geometric.normal_modes.frequency_analysis(coords, hessian_cart, elem = molecule.elem))
+        # print(IC.Internals)
+        # print(IC.Prims)
+        # print(geometric.normal_modes.frequency_analysis(coords, hessian_cart, elem = molecule.elem))
         return hessian_cart
-

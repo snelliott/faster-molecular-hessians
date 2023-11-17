@@ -78,7 +78,7 @@ class HarmonicModel(EnergyModel):
             raise ValueError(f'Model error exceeds 1 meV. Actual: {max_error:.2e}')
 
         return model
-    
+
     def mean_hessian(self, model: LinearModel) -> np.ndarray:
         return self._params_to_hessian(model.coef_)
 
